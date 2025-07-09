@@ -11,6 +11,7 @@
     "require": {
         "php": "^8.2",
         "laravel/framework": "^12.0",
+        "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.10.1",
         "scalar/laravel": "^0.2.0"
     },
@@ -59,8 +60,8 @@
             "@php artisan config:clear --ansi",
             "@php artisan test"
         ],
-        "sailup": [
-            "./vendor/bin/sail up"
+        "sail": [
+            "./vendor/bin/sail"
         ]
     },
     "extra": {
