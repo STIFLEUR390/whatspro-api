@@ -19,7 +19,11 @@ RUN apk add --no-cache \
     curl \
     libzip-dev \
     libpq \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp --with-xpm \
+    pcre-dev \
+    openssl-dev \
+    \
+    # Pour dom, xml, xmlwriter, fileinfo, phar, session, tokenizer, ctype, iconv, json, hash, filter
+    # (inclus dans php8.2 de base, mais on force l'installation pour être sûr)
     && docker-php-ext-install \
         pdo \
         pdo_pgsql \
@@ -28,9 +32,20 @@ RUN apk add --no-cache \
         gd \
         intl \
         xml \
+        xmlwriter \
+        dom \
         mbstring \
         zip \
         opcache \
+        fileinfo \
+        phar \
+        session \
+        tokenizer \
+        ctype \
+        iconv \
+        json \
+        hash \
+        filter \
     && pecl install redis \
     && docker-php-ext-enable redis
 
