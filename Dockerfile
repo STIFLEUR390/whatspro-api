@@ -18,7 +18,7 @@ RUN apk add --no-cache \
     git \
     curl \
     libzip-dev \
-    libpq \
+    postgresql-dev \
     pcre-dev \
     openssl-dev \
     \
