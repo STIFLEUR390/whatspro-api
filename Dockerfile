@@ -40,7 +40,6 @@ RUN apk add --no-cache \
         fileinfo \
         phar \
         session \
-        tokenizer \
         ctype \
         iconv \
         json \
