@@ -48,7 +48,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # Installer Composer
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Créer un utilisateur non-root
 RUN groupadd -g 1000 www && \
