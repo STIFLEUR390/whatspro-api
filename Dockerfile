@@ -79,6 +79,10 @@ COPY docker/supervisord.conf /etc/supervisor/supervisord.conf
 # Ajuster les permissions
 RUN chown -R www:www /var/www/html
 
+RUN mkdir -p /var/www/html/storage/logs && \
+    touch /var/www/html/storage/logs/queue-worker.log && \
+    chown -R www:www /var/www/html/storage
+
 USER www
 
 # Exposer HTTP et WebSocket SSL
