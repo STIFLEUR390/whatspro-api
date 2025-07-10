@@ -8,7 +8,8 @@ services:
         container_name: whatspro-app
         restart: unless-stopped
         volumes:
-            - ./:/var/www/html
+            - ./:/var/www/html:rw
+            - logs_data:/var/www/html/storage/logs
         environment:
             - APP_NAME=${APP_NAME:-WhatsPro}
             - APP_ENV=${APP_ENV:-local}
@@ -67,7 +68,8 @@ services:
         restart: unless-stopped
         command: ["supervisord", "-c", "/etc/supervisor/supervisord.conf"]
         volumes:
-            - ./:/var/www/html
+            - ./:/var/www/html:rw
+            - logs_data:/var/www/html/storage/logs
         environment:
             - QUEUE_CONNECTION=${QUEUE_CONNECTION:-rabbitmq}
             - RABBITMQ_HOST=${RABBITMQ_HOST:-host.docker.internal}
@@ -75,3 +77,6 @@ services:
             - RABBITMQ_USER=${RABBITMQ_USER:-rabbitmq}
             - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD:-rabbitmq}
             - RABBITMQ_VHOST=${RABBITMQ_VHOST:-/}
+
+volumes:
+    logs_data:
