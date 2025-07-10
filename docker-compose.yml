@@ -65,7 +65,7 @@ services:
             dockerfile: Dockerfile
         container_name: whatspro-queue-worker
         restart: unless-stopped
-        command: ["supervisord", "-c", "/etc/supervisor/supervisord.conf"]
+        command: sh -c "mkdir -p /var/www/html/storage/logs && touch /var/www/html/storage/logs/queue-worker.log && supervisord -c /etc/supervisor/supervisord.conf"
         volumes:
             - ./:/var/www/html
         environment:
