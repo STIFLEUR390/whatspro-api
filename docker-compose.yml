@@ -7,16 +7,14 @@ services:
             dockerfile: Dockerfile
         container_name: whatspro-app
         restart: unless-stopped
-        ports:
-            - "8970:80"
         volumes:
             - ./:/var/www/html
         environment:
             - APP_NAME=${APP_NAME:-WhatsPro}
-            - APP_ENV=${APP_ENV:-production}
-            - APP_KEY=${APP_KEY}
-            - APP_DEBUG=${APP_DEBUG:-false}
-            - APP_URL=${APP_URL:-http://localhost}
+            - APP_ENV=${APP_ENV:-local}
+            - APP_KEY=${APP_KEY:-base64:7ctbkBFaeYvfREASlB8/lTyZ4DGDeNzV/KT5H9+Fd3Y=}
+            - APP_DEBUG=${APP_DEBUG:-"true"}
+            - APP_URL=${APP_URL:-http://whatspro-api.local}
 
             - DB_CONNECTION=${DB_CONNECTION:-pgsql}
             - DB_HOST=${DB_HOST:-host.docker.internal}
@@ -33,9 +31,9 @@ services:
             - REDIS_PORT=${REDIS_PORT:-6379}
 
             - BROADCAST_CONNECTION=${BROADCAST_CONNECTION:-pusher}
-            - PUSHER_APP_ID=${PUSHER_APP_ID}
-            - PUSHER_APP_KEY=${PUSHER_APP_KEY}
-            - PUSHER_APP_SECRET=${PUSHER_APP_SECRET}
+            - PUSHER_APP_ID=${PUSHER_APP_ID:-oL6RX1pQdlKTPqAr}
+            - PUSHER_APP_KEY=${PUSHER_APP_KEY:-bSM7rJucBDeIplGF}
+            - PUSHER_APP_SECRET=${PUSHER_APP_SECRET:-xPxXWx0Lwx4QWy7eEGUyaQXpf790QGP0*}
             - PUSHER_HOST=${PUSHER_HOST:-localhost}
             - PUSHER_PORT=${PUSHER_PORT:-6001}
             - PUSHER_SCHEME=${PUSHER_SCHEME:-http}
@@ -48,18 +46,18 @@ services:
             - MAIL_FROM_ADDRESS=${MAIL_FROM_ADDRESS:-"noreply@whatspro.com"}
             - MAIL_FROM_NAME=${MAIL_FROM_NAME:-WhatsPro}
 
-            - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-            - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+            - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID:-0C15b0npFBL3fE3LDsWS}
+            - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY:-LDo1yDtOZN9wSM34fT2hJsZqwjV5HIWZMTFEdvM2}
             - AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION:-us-east-1}
             - AWS_BUCKET=${AWS_BUCKET:-whatspro}
             - AWS_USE_PATH_STYLE_ENDPOINT=${AWS_USE_PATH_STYLE_ENDPOINT:-"true"}
             - AWS_ENDPOINT=${AWS_ENDPOINT:-http://localhost:9000}
             - AWS_URL=${AWS_URL:-http://localhost:9000/whatspro}
-        healthcheck:
-            test: ["CMD", "curl", "-f", "http://localhost"]
-            interval: 30s
-            timeout: 10s
-            retries: 3
+
+        ports:
+            - "8970:80"
+        depends_on:
+            - queue
 
     queue:
         build:
@@ -67,6 +65,7 @@ services:
             dockerfile: Dockerfile
         container_name: whatspro-queue-worker
         restart: unless-stopped
+        command: sh -c "mkdir -p /var/www/html/storage/logs && touch /var/www/html/storage/logs/queue-worker.log && supervisord -c /etc/supervisor/supervisord.conf"
         volumes:
             - ./:/var/www/html
         environment:
