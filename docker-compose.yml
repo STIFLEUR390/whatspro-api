@@ -55,7 +55,7 @@ services:
             - AWS_URL=${AWS_URL:-http://localhost:9000/whatspro}
 
         ports:
-            - "8970:80"
+            - "9000:80"
         depends_on:
             - queue
 
