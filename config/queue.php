@@ -65,11 +65,31 @@ return [
 
         'redis' => [
             'driver' => 'redis',
-            'connection' => env('REDIS_QUEUE_CONNECTION', 'default'),
+            'connection' => env('REDIS_QUEUE_CONNECTION', default: 'default'),
             'queue' => env('REDIS_QUEUE', 'default'),
             'retry_after' => (int) env('REDIS_QUEUE_RETRY_AFTER', 90),
             'block_for' => null,
             'after_commit' => false,
+        ],
+
+        'rabbitmq' => [
+
+            'driver' => 'rabbitmq',
+            'hosts' => [
+                [
+                    'host' => env('RABBITMQ_HOST', '127.0.0.1'),
+                    'port' => env('RABBITMQ_PORT', default: 15672),
+                    'user' => env('RABBITMQ_USER', default: 'rabbitmq'),
+                    'password' => env('RABBITMQ_PASSWORD', default: 'rabbitmq'),
+                    'vhost' => env('RABBITMQ_VHOST', '/'),
+                ],
+            ],
+            'options' => [
+                'queue' => [
+                    'prioritize_delayed' =>  false,
+                    'queue_max_priority' => 10,
+                ],
+            ],
         ],
 
     ],

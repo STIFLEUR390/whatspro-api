@@ -1,164 +1,77 @@
+version: "3.8"
+
 services:
     app:
         build:
             context: .
             dockerfile: Dockerfile
-        extra_hosts:
-            - "host.docker.internal:host-gateway"
-        ports:
-            - "${APP_PORT:-80}:80"
-            - "${VITE_PORT:-5173}:${VITE_PORT:-5173}"
-        environment:
-            WWWUSER: "${WWWUSER}"
-            LARAVEL_SAIL: 0
+        container_name: whatspro-app
+        restart: unless-stopped
         volumes:
-            - ".:/var/www/html"
-        networks:
-            - sail
+            - ./:/var/www/html
+        environment:
+            - APP_NAME=${APP_NAME:-WhatsPro}
+            - APP_ENV=${APP_ENV:-local}
+            - APP_KEY=${APP_KEY:-base64:7ctbkBFaeYvfREASlB8/lTyZ4DGDeNzV/KT5H9+Fd3Y=}
+            - APP_DEBUG=${APP_DEBUG:-"true"}
+            - APP_URL=${APP_URL:-http://whatspro-api.local}
+
+            - DB_CONNECTION=${DB_CONNECTION:-pgsql}
+            - DB_HOST=${DB_HOST:-host.docker.internal}
+            - DB_PORT=${DB_PORT:-5432}
+            - DB_DATABASE=${DB_DATABASE:-whatspro_api}
+            - DB_USERNAME=${DB_USERNAME:-postgres}
+            - DB_PASSWORD=${DB_PASSWORD:-}
+
+            - QUEUE_CONNECTION=${QUEUE_CONNECTION:-rabbitmq}
+            - SESSION_DRIVER=${SESSION_DRIVER:-database}
+            - CACHE_STORE=${CACHE_STORE:-database}
+            - REDIS_CLIENT=${REDIS_CLIENT:-phpredis}
+            - REDIS_HOST=${REDIS_HOST:-redis}
+            - REDIS_PORT=${REDIS_PORT:-6379}
+
+            - BROADCAST_CONNECTION=${BROADCAST_CONNECTION:-pusher}
+            - PUSHER_APP_ID=${PUSHER_APP_ID:-oL6RX1pQdlKTPqAr}
+            - PUSHER_APP_KEY=${PUSHER_APP_KEY:-bSM7rJucBDeIplGF}
+            - PUSHER_APP_SECRET=${PUSHER_APP_SECRET:-xPxXWx0Lwx4QWy7eEGUyaQXpf790QGP0*}
+            - PUSHER_HOST=${PUSHER_HOST:-localhost}
+            - PUSHER_PORT=${PUSHER_PORT:-6001}
+            - PUSHER_SCHEME=${PUSHER_SCHEME:-http}
+            - PUSHER_USE_TLS=${PUSHER_USE_TLS:-"0"}
+            - PUSHER_APP_CLUSTER=${PUSHER_APP_CLUSTER:-mt1}
+
+            - MAIL_MAILER=${MAIL_MAILER:-smtp}
+            - MAIL_HOST=${MAIL_HOST:-mailpit.applix.fr}
+            - MAIL_PORT=${MAIL_PORT:-1025}
+            - MAIL_FROM_ADDRESS=${MAIL_FROM_ADDRESS:-"noreply@whatspro.com"}
+            - MAIL_FROM_NAME=${MAIL_FROM_NAME:-WhatsPro}
+
+            - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID:-0C15b0npFBL3fE3LDsWS}
+            - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY:-LDo1yDtOZN9wSM34fT2hJsZqwjV5HIWZMTFEdvM2}
+            - AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION:-us-east-1}
+            - AWS_BUCKET=${AWS_BUCKET:-whatspro}
+            - AWS_USE_PATH_STYLE_ENDPOINT=${AWS_USE_PATH_STYLE_ENDPOINT:-"true"}
+            - AWS_ENDPOINT=${AWS_ENDPOINT:-http://localhost:9000}
+            - AWS_URL=${AWS_URL:-http://localhost:9000/whatspro}
+
+        ports:
+            - "8000:80"
         depends_on:
-            - pgsql
-            - redis
-            - meilisearch
-            - minio
-            - mailpit
-            - rabbitmq
-            - soketi
-    # Les autres services restent inchangés
-    pgsql:
-        image: "postgres:17"
-        ports:
-            - "${FORWARD_DB_PORT:-5432}:5432"
-        environment:
-            PGPASSWORD: "${DB_PASSWORD:-secret}"
-            POSTGRES_DB: "${DB_DATABASE}"
-            POSTGRES_USER: "${DB_USERNAME}"
-            POSTGRES_PASSWORD: "${DB_PASSWORD:-secret}"
+            - queue
+
+    queue:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: whatspro-queue-worker
+        restart: unless-stopped
+        command: ["supervisord", "-c", "/etc/supervisor/supervisord.conf"]
         volumes:
-            - "sail-pgsql:/var/lib/postgresql/data"
-            - "./vendor/laravel/sail/database/pgsql/create-testing-database.sql:/docker-entrypoint-initdb.d/10-create-testing-database.sql"
-        networks:
-            - sail
-        healthcheck:
-            test:
-                - CMD
-                - pg_isready
-                - "-q"
-                - "-d"
-                - "${DB_DATABASE}"
-                - "-U"
-                - "${DB_USERNAME}"
-            retries: 3
-            timeout: 5s
-    redis:
-        image: "redis:alpine"
-        ports:
-            - "${FORWARD_REDIS_PORT:-6379}:6379"
-        volumes:
-            - "sail-redis:/data"
-        networks:
-            - sail
-        healthcheck:
-            test:
-                - CMD
-                - redis-cli
-                - ping
-            retries: 3
-            timeout: 5s
-    meilisearch:
-        image: "getmeili/meilisearch:latest"
-        ports:
-            - "${FORWARD_MEILISEARCH_PORT:-7700}:7700"
+            - ./:/var/www/html
         environment:
-            MEILI_NO_ANALYTICS: "${MEILISEARCH_NO_ANALYTICS:-false}"
-        volumes:
-            - "sail-meilisearch:/meili_data"
-        networks:
-            - sail
-        healthcheck:
-            test:
-                - CMD
-                - wget
-                - "--no-verbose"
-                - "--spider"
-                - "http://127.0.0.1:7700/health"
-            retries: 3
-            timeout: 5s
-    minio:
-        image: "minio/minio:latest"
-        ports:
-            - "${FORWARD_MINIO_PORT:-9000}:9000"
-            - "${FORWARD_MINIO_CONSOLE_PORT:-8900}:8900"
-        environment:
-            MINIO_ROOT_USER: sail
-            MINIO_ROOT_PASSWORD: password
-        volumes:
-            - "sail-minio:/data"
-        networks:
-            - sail
-        command: 'minio server /data --console-address ":8900"'
-        healthcheck:
-            test:
-                - CMD
-                - mc
-                - ready
-                - local
-            retries: 3
-            timeout: 5s
-    mailpit:
-        image: "axllent/mailpit:latest"
-        ports:
-            - "${FORWARD_MAILPIT_PORT:-1025}:1025"
-            - "${FORWARD_MAILPIT_DASHBOARD_PORT:-8025}:8025"
-        networks:
-            - sail
-    rabbitmq:
-        image: "rabbitmq:4-management"
-        hostname: rabbitmq
-        ports:
-            - "${FORWARD_RABBITMQ_PORT:-5672}:5672"
-            - "${FORWARD_RABBITMQ_DASHBOARD_PORT:-15672}:15672"
-        environment:
-            RABBITMQ_HOST: "%"
-            RABBITMQ_USER: "${RABBITMQ_USER}"
-            RABBITMQ_PASSWORD: "${RABBITMQ_PASSWORD}"
-            RABBITMQ_VHOST: "${RABBITMQ_VHOST}"
-            RABBITMQ_QUEUE: "${RABBITMQ_QUEUE}"
-        volumes:
-            - "sail-rabbitmq:/var/lib/rabbitmq"
-        networks:
-            - sail
-        healthcheck:
-            test:
-                - CMD
-                - rabbitmq-diagnostics
-                - "-q"
-                - ping
-            retries: 3
-            timeout: 5s
-    soketi:
-        image: "quay.io/soketi/soketi:latest-16-alpine"
-        environment:
-            SOKETI_DEBUG: "${SOKETI_DEBUG:-1}"
-            SOKETI_METRICS_SERVER_PORT: "9601"
-            SOKETI_DEFAULT_APP_ID: "${PUSHER_APP_ID}"
-            SOKETI_DEFAULT_APP_KEY: "${PUSHER_APP_KEY}"
-            SOKETI_DEFAULT_APP_SECRET: "${PUSHER_APP_SECRET}"
-        ports:
-            - "${PUSHER_PORT:-6001}:6001"
-            - "${PUSHER_METRICS_PORT:-9601}:9601"
-        networks:
-            - sail
-networks:
-    sail:
-        driver: bridge
-volumes:
-    sail-pgsql:
-        driver: local
-    sail-redis:
-        driver: local
-    sail-meilisearch:
-        driver: local
-    sail-minio:
-        driver: local
-    sail-rabbitmq:
-        driver: local
+            - QUEUE_CONNECTION=${QUEUE_CONNECTION:-rabbitmq}
+            - RABBITMQ_HOST=${RABBITMQ_HOST:-host.docker.internal}
+            - RABBITMQ_PORT=${RABBITMQ_PORT:-5672}
+            - RABBITMQ_USER=${RABBITMQ_USER:-rabbitmq}
+            - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD:-rabbitmq}
+            - RABBITMQ_VHOST=${RABBITMQ_VHOST:-/}
