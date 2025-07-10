@@ -11,9 +11,9 @@ services:
             - logs_data:/var/www/html/storage/logs
         environment:
             - APP_NAME=${APP_NAME:-WhatsPro}
-            - APP_ENV=${APP_ENV:-local}
-            - APP_KEY=${APP_KEY:-base64:7ctbkBFaeYvfREASlB8/lTyZ4DGDeNzV/KT5H9+Fd3Y=}
-            - APP_DEBUG=${APP_DEBUG:-"true"}
+            - APP_ENV=${APP_ENV:-production}
+            - APP_KEY=${APP_KEY}
+            - APP_DEBUG=${APP_DEBUG:-"false"}
             - APP_URL=${APP_URL:-http://whatspro-api.local}
 
             - DB_CONNECTION=${DB_CONNECTION:-pgsql}
@@ -23,12 +23,15 @@ services:
             - DB_USERNAME=${DB_USERNAME:-postgres}
             - DB_PASSWORD=${DB_PASSWORD:-}
 
-            - QUEUE_CONNECTION=${QUEUE_CONNECTION:-rabbitmq}
+            - QUEUE_CONNECTION=${QUEUE_CONNECTION:-redis}
             - SESSION_DRIVER=${SESSION_DRIVER:-database}
             - CACHE_STORE=${CACHE_STORE:-database}
             - REDIS_CLIENT=${REDIS_CLIENT:-phpredis}
-            - REDIS_HOST=${REDIS_HOST:-redis}
-            - REDIS_PORT=${REDIS_PORT:-6379}
+            - REDIS_HOST=${REDIS_HOST:-88.223.92.13}
+            - REDIS_PORT=${REDIS_PORT:-5448}
+            - REDIS_USERNAME=${REDIS_USERNAME:-default}
+            - REDIS_PASSWORD=${REDIS_PASSWORD}
+            - REDIS_DB=${REDIS_DB:-0}
 
             - BROADCAST_CONNECTION=${BROADCAST_CONNECTION:-pusher}
             - PUSHER_APP_ID=${PUSHER_APP_ID:-oL6RX1pQdlKTPqAr}
@@ -53,30 +56,6 @@ services:
             - AWS_USE_PATH_STYLE_ENDPOINT=${AWS_USE_PATH_STYLE_ENDPOINT:-"true"}
             - AWS_ENDPOINT=${AWS_ENDPOINT:-http://localhost:9000}
             - AWS_URL=${AWS_URL:-http://localhost:9000/whatspro}
-
-        ports:
-            - "9000:80"
-        depends_on:
-            - queue
-
-    queue:
-        build:
-            context: .
-            dockerfile: Dockerfile
-        container_name: whatspro-queue-worker
-        restart: unless-stopped
-        command: ["supervisord", "-c", "/etc/supervisor/supervisord.conf"]
-        volumes:
-            # Pour le développement, décommente la ligne suivante :
-            # - ./:/var/www/html:rw
-            - logs_data:/var/www/html/storage/logs
-        environment:
-            - QUEUE_CONNECTION=${QUEUE_CONNECTION:-rabbitmq}
-            - RABBITMQ_HOST=${RABBITMQ_HOST:-host.docker.internal}
-            - RABBITMQ_PORT=${RABBITMQ_PORT:-5672}
-            - RABBITMQ_USER=${RABBITMQ_USER:-rabbitmq}
-            - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD:-rabbitmq}
-            - RABBITMQ_VHOST=${RABBITMQ_VHOST:-/}
 
 volumes:
     logs_data:
