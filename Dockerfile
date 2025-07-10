@@ -78,11 +78,6 @@ COPY docker/supervisord.conf /etc/supervisor/supervisord.conf
 
 # Ajuster les permissions
 RUN chown -R www:www /var/www/html
-RUN chmod -R 775 /var/www/html/storage
-
-RUN mkdir -p /var/www/html/storage/logs && \
-    touch /var/www/html/storage/logs/queue-worker.log && \
-    chown -R www:www /var/www/html/storage
 
 USER www
 

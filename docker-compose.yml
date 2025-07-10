@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
     app:
         build:
@@ -8,7 +6,8 @@ services:
         container_name: whatspro-app
         restart: unless-stopped
         volumes:
-            - ./:/var/www/html:rw
+            # Pour le développement, décommente la ligne suivante :
+            # - ./:/var/www/html:rw
             - logs_data:/var/www/html/storage/logs
         environment:
             - APP_NAME=${APP_NAME:-WhatsPro}
@@ -68,7 +67,8 @@ services:
         restart: unless-stopped
         command: ["supervisord", "-c", "/etc/supervisor/supervisord.conf"]
         volumes:
-            - ./:/var/www/html:rw
+            # Pour le développement, décommente la ligne suivante :
+            # - ./:/var/www/html:rw
             - logs_data:/var/www/html/storage/logs
         environment:
             - QUEUE_CONNECTION=${QUEUE_CONNECTION:-rabbitmq}
