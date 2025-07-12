@@ -31,7 +31,8 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction
 RUN chown -R www-data:www-data /var/www \
     && find /var/www -type d -exec chmod 755 {} \; \
     && find /var/www -type f -exec chmod 644 {} \; \
-    && chmod -R 775 /var/www/storage /var/www/bootstrap/cache
+    && [ -d /var/www/storage ] && chmod -R 775 /var/www/storage || true \
+    && [ -d /var/www/bootstrap/cache ] && chmod -R 775 /var/www/bootstrap/cache || true
 
 FROM production AS development
 
