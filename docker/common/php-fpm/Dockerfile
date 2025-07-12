@@ -18,7 +18,7 @@ RUN apt-get update && apt-get install -y \
     curl \
     unzip \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install pdo pdo_pgsql pcntl gd \
+    && docker-php-ext-install pdo pdo_pgsql pcntl gd sockets \
     && pecl install amqp redis xdebug \
     && docker-php-ext-enable amqp redis xdebug \
     && rm -rf /var/lib/apt/lists/*
