@@ -28,7 +28,7 @@ services:
       - .env.production
     user: "1000:1000"
     volumes:
-      - ./storage:/var/www/storage
+      # - ./storage:/var/www/storage   # Supprimé pour éviter les problèmes de permissions
       - ./public:/var/www/public
     networks:
       - laravel-production
