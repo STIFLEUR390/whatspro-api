@@ -17,9 +17,6 @@ RUN apt-get update && apt-get install -y \
     curl \
     unzip \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    # Active les extensions déjà présentes
-    && docker-php-ext-enable ctype curl dom fileinfo filter hash iconv json mbstring openssl pcre phar session sockets tokenizer xml posix \
-    # Installe seulement celles qui nécessitent une compilation
     && docker-php-ext-install pdo pdo_pgsql pcntl gd \
     && pecl install amqp redis xdebug \
     && docker-php-ext-enable amqp redis xdebug \
