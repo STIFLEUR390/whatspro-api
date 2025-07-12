@@ -12,6 +12,7 @@ RUN apt-get update && apt-get install -y \
     libicu-dev \
     libzip-dev \
     libpq-dev \
+    librabbitmq-dev \
     supervisor \
     git \
     curl \
