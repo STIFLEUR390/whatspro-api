@@ -28,6 +28,10 @@ COPY --from=composer:2.6 /usr/bin/composer /usr/bin/composer
 WORKDIR /var/www
 COPY . /var/www
 RUN composer install --no-dev --optimize-autoloader --no-interaction
+RUN chown -R www-data:www-data /var/www \
+    && find /var/www -type d -exec chmod 755 {} \; \
+    && find /var/www -type f -exec chmod 644 {} \; \
+    && chmod -R 775 /var/www/storage /var/www/bootstrap/cache
 
 FROM production AS development
 
