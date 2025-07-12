@@ -4,8 +4,6 @@ services:
     build:
       context: .
       dockerfile: ./docker/development/nginx/Dockerfile
-    volumes:
-      # - ./:/var/www   # NE PAS MONTER LE CODE EN PROD, sinon vendor/ sera manquant
     ports:
       - "8080:80"
     depends_on:
@@ -30,7 +28,6 @@ services:
       - .env.production
     user: "1000:1000"
     volumes:
-      # - ./:/var/www   # NE PAS MONTER LE CODE EN PROD, sinon vendor/ sera manquant
       - ./storage:/var/www/storage
       - ./public:/var/www/public
     networks:
