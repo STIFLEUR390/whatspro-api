@@ -6,11 +6,7 @@ services:
       dockerfile: ./docker/development/nginx/Dockerfile
     volumes:
       - ./:/var/www
-      # ATTENTION : Assurez-vous que le fichier ./docker/development/nginx/nginx.conf existe et N'EST PAS un dossier !
-      # Si ce n'est pas le cas, commentez la ligne ci-dessous ou adaptez le chemin :
-      - ./docker/development/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      # Alternative :
-      # - ${NGINX_CONF_PATH:-./docker/development/nginx/nginx.conf}:/etc/nginx/nginx.conf:ro
+      - ${NGINX_CONF_PATH:-./docker/development/nginx/nginx.conf}:/etc/nginx/nginx.conf:ro
     ports:
       - "8080:80"
     depends_on:
