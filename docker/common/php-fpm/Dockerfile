@@ -77,7 +77,7 @@ COPY ./docker/development/php-fpm/entrypoint.sh /usr/local/bin/entrypoint.sh
 COPY ./docker/development/php-fpm/supervisord.conf /etc/supervisor/supervisord.conf
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
-USER www
+USER www-data
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 

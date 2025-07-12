@@ -1,3 +1,4 @@
 #!/bin/bash
-composer install --no-interaction --prefer-dist --optimize-autoloader
-exec /usr/bin/supervisord -c /etc/supervisor/supervisord.conf
+chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
+chmod -R 775 /var/www/storage /var/www/bootstrap/cache
+exec php-fpm
