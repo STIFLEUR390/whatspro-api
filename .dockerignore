@@ -1,5 +1,4 @@
-vendor
+# Exclure seulement les fichiers de développement, pas les dossiers essentiels
 node_modules
-storage
 .env
 .git
