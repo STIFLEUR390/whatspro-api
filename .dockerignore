@@ -1,4 +1,2 @@
-# Exclure seulement les fichiers de développement, pas les dossiers essentiels
-node_modules
 .env
 .git
